@@ -3,60 +3,142 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>No te hagas el pisho pistola</title>
+    <title>Tateti</title>
     <style>
         body {
             background-color: #ff6347; /* Color de fondo rojo */
             font-family: Arial, sans-serif;
-            text-align: center;
-            color: #fff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
             margin: 0;
-            padding: 0;
-            overflow: hidden; /* Ocultar barras de desplazamiento */
         }
-        header {
-            padding: 20px;
-            background-color: #b22222; /* Rojo más oscuro para el encabezado */
-            color: white;
+        .tateti {
+            display: grid;
+            grid-template-columns: repeat(3, 100px);
+            grid-template-rows: repeat(3, 100px);
+            gap: 5px;
         }
-        #cat {
-            position: absolute;
-            width: 150px;
-            height: auto;
-            border: 2px solid #b22222; /* Bordes rojos para la imagen */
+        .cell {
+            width: 100px;
+            height: 100px;
+            background-color: #fff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 2em;
+            color: #b22222;
             border-radius: 10px;
             cursor: pointer;
+        }
+        header {
+            position: absolute;
+            top: 0;
+            width: 100%;
+            background-color: #b22222; /* Rojo más oscuro para el encabezado */
+            color: white;
+            text-align: center;
+            padding: 20px;
+        }
+        #status {
+            margin-top: 20px;
+            font-size: 1.5em;
+            color: white;
         }
     </style>
 </head>
 <body>
     <header>
-        <h1>No te hagas el pisho pistola</h1>
+        <h1>Tateti</h1>
     </header>
-    <main>
-        <img id="cat" src="https://cdn2.thecatapi.com/images/MTY3ODIyMQ.jpg" alt="Gatito">
-    </main>
+    <div id="status">Turno del jugador X</div>
+    <div class="tateti">
+        <div class="cell" data-index="0"></div>
+        <div class="cell" data-index="1"></div>
+        <div class="cell" data-index="2"></div>
+        <div class="cell" data-index="3"></div>
+        <div class="cell" data-index="4"></div>
+        <div class="cell" data-index="5"></div>
+        <div class="cell" data-index="6"></div>
+        <div class="cell" data-index="7"></div>
+        <div class="cell" data-index="8"></div>
+    </div>
     <script>
-        const cat = document.getElementById('cat');
+        const cells = document.querySelectorAll('.cell');
+        const statusDisplay = document.getElementById('status');
+        let currentPlayer = 'X';
+        let gameState = ["", "", "", "", "", "", "", "", ""];
+        const winningConditions = [
+            [0, 1, 2],
+            [3, 4, 5],
+            [6, 7, 8],
+            [0, 3, 6],
+            [1, 4, 7],
+            [2, 5, 8],
+            [0, 4, 8],
+            [2, 4, 6]
+        ];
 
-        function getRandomPosition() {
-            const screenWidth = window.innerWidth - cat.width;
-            const screenHeight = window.innerHeight - cat.height;
-            const randomX = Math.floor(Math.random() * screenWidth);
-            const randomY = Math.floor(Math.random() * screenHeight);
-            return { x: randomX, y: randomY };
+        function handleCellClick(event) {
+            const clickedCell = event.target;
+            const clickedCellIndex = parseInt(clickedCell.getAttribute('data-index'));
+
+            if (gameState[clickedCellIndex] !== "" || !gameActive) {
+                return;
+            }
+
+            gameState[clickedCellIndex] = currentPlayer;
+            clickedCell.textContent = currentPlayer;
+
+            handleResultValidation();
         }
 
-        function moveCat() {
-            const position = getRandomPosition();
-            cat.style.left = `${position.x}px`;
-            cat.style.top = `${position.y}px`;
+        function handleResultValidation() {
+            let roundWon = false;
+            for (let i = 0; i < winningConditions.length; i++) {
+                const winCondition = winningConditions[i];
+                let a = gameState[winCondition[0]];
+                let b = gameState[winCondition[1]];
+                let c = gameState[winCondition[2]];
+                if (a === '' || b === '' || c === '') {
+                    continue;
+                }
+                if (a === b && b === c) {
+                    roundWon = true;
+                    break;
+                }
+            }
+
+            if (roundWon) {
+                statusDisplay.textContent = `Jugador ${currentPlayer} ha ganado!`;
+                gameActive = false;
+                return;
+            }
+
+            let roundDraw = !gameState.includes("");
+            if (roundDraw) {
+                statusDisplay.textContent = 'Empate!';
+                gameActive = false;
+                return;
+            }
+
+            currentPlayer = currentPlayer === "X" ? "O" : "X";
+            statusDisplay.textContent = `Turno del jugador ${currentPlayer}`;
         }
 
-        cat.addEventListener('click', moveCat);
+        function handleRestartGame() {
+            gameActive = true;
+            currentPlayer = 'X';
+            gameState = ["", "", "", "", "", "", "", "", ""];
+            statusDisplay.textContent = `Turno del jugador ${currentPlayer}`;
+            document.querySelectorAll('.cell').forEach(cell => cell.textContent = "");
+        }
 
-        // Inicializar en una posición aleatoria al cargar la página
-        window.onload = moveCat;
+        let gameActive = true;
+
+        document.querySelectorAll('.cell').forEach(cell => cell.addEventListener('click', handleCellClick));
+        document.querySelector('.tateti').addEventListener('dblclick', handleRestartGame);
     </script>
 </body>
 </html>
