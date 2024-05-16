@@ -10,18 +10,22 @@
             font-family: Arial, sans-serif;
             text-align: center;
             color: #333;
+            margin: 0;
+            padding: 0;
+            overflow: hidden; /* Ocultar barras de desplazamiento */
         }
         header {
             padding: 20px;
             background-color: #4682B4; /* Azul más oscuro para el encabezado */
             color: white;
         }
-        img {
-            width: 300px;
+        #cat {
+            position: absolute;
+            width: 150px;
             height: auto;
-            margin: 20px;
-            border: 2px solid #4682B4; /* Bordes azules para las imágenes */
+            border: 2px solid #4682B4; /* Bordes azules para la imagen */
             border-radius: 10px;
+            cursor: pointer;
         }
     </style>
 </head>
@@ -30,13 +34,29 @@
         <h1>No te hagas el pisho pistola</h1>
     </header>
     <main>
-        <section>
-            <h2>Galería de gatitos</h2>
-            <img src="https://placekitten.com/300/300" alt="Gatito 1">
-            <img src="https://placekitten.com/301/300" alt="Gatito 2">
-            <img src="https://placekitten.com/302/300" alt="Gatito 3">
-            <img src="https://placekitten.com/303/300" alt="Gatito 4">
-        </section>
+        <img id="cat" src="https://placekitten.com/150/150" alt="Gatito">
     </main>
+    <script>
+        const cat = document.getElementById('cat');
+
+        function getRandomPosition() {
+            const screenWidth = window.innerWidth - cat.width;
+            const screenHeight = window.innerHeight - cat.height;
+            const randomX = Math.floor(Math.random() * screenWidth);
+            const randomY = Math.floor(Math.random() * screenHeight);
+            return { x: randomX, y: randomY };
+        }
+
+        function moveCat() {
+            const position = getRandomPosition();
+            cat.style.left = `${position.x}px`;
+            cat.style.top = `${position.y}px`;
+        }
+
+        cat.addEventListener('click', moveCat);
+
+        // Inicializar en una posición aleatoria al cargar la página
+        window.onload = moveCat;
+    </script>
 </body>
 </html>
